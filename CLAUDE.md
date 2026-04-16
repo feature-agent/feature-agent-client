@@ -76,7 +76,7 @@ Production" by Adnan Khan.
 ### Phase 1 -- Shell, theme, task submission [DONE]
   PR: "feat: HTML shell, dark theme, task form"
 
-### Phase 2 -- Pipeline dashboard and SSE [ ]
+### Phase 2 -- Pipeline dashboard and SSE [DONE]
   PR: "feat: skill pipeline, SSE streaming,
        live timer, task status"
 

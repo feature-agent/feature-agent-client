@@ -643,6 +643,390 @@
       border-radius: 4px;
     }
 
+    /* Clarification panel */
+    .clarification-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin: 16px 0;
+    }
+
+    .clarification-panel.open {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .clarification-inner {
+      border: 1.5px solid var(--amber);
+      background: #1A1000;
+      border-radius: 12px;
+      padding: 20px;
+      animation: amberpulse 2s ease-in-out infinite;
+    }
+
+    @keyframes amberpulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.1); }
+    }
+
+    .clarification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .clarification-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--amber);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .clarification-counter {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .clarification-counter.all-answered {
+      color: var(--green);
+    }
+
+    .clarification-subtext {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .question-card {
+      background: #0F1823;
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .question-header {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--dim);
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      color: var(--white);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .option-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 44px;
+      margin-bottom: 4px;
+    }
+
+    .option-row:hover {
+      background: var(--card);
+    }
+
+    .option-row:hover .option-label {
+      color: var(--white);
+    }
+
+    .option-row.selected {
+      background: #0D2B26;
+      border-left: 3px solid var(--teal);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .option-row.selected .option-label {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .option-radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--dim);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      transition: all 0.15s ease;
+    }
+
+    .option-row.selected .option-radio {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    .option-radio-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--white);
+      display: none;
+    }
+
+    .option-row.selected .option-radio-dot {
+      display: block;
+    }
+
+    .option-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .option-letter {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--teal);
+      margin-bottom: 2px;
+    }
+
+    .option-label {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .other-textarea {
+      width: 100%;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-size: 13px;
+      padding: 0;
+      margin-top: 0;
+      resize: none;
+    }
+
+    .other-textarea.open {
+      max-height: 100px;
+      min-height: 60px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .other-textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .other-textarea::placeholder {
+      color: var(--dim);
+    }
+
+    .clarification-submit {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-amber {
+      background: var(--amber);
+      color: #000;
+    }
+
+    .btn-amber:hover {
+      background: #d97706;
+    }
+
+    .btn-amber:disabled {
+      background: var(--dim);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .clarification-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 6px;
+      display: none;
+    }
+
+    .clarification-error.visible {
+      display: block;
+    }
+
+    /* Log panel */
+    .log-section {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .log-title {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .log-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .log-container {
+      background: #050A14;
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      height: 280px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .log-line {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .log-ts {
+      color: var(--dim);
+    }
+
+    .log-level-info { color: var(--muted); }
+    .log-level-warn { color: var(--amber); }
+    .log-level-error { color: var(--red); }
+    .log-level-success { color: var(--green); }
+
+    /* Benchmark table */
+    .benchmark-section {
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .benchmark-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .benchmark-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .benchmark-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .benchmark-table th {
+      background: var(--card);
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .benchmark-table td {
+      padding: 8px 12px;
+      color: var(--white);
+    }
+
+    .benchmark-table tr:nth-child(even) td {
+      background: #111827;
+    }
+
+    .benchmark-table tr:nth-child(odd) td {
+      background: var(--bg);
+    }
+
+    .benchmark-table tr.retried td {
+      border-left: 3px solid var(--amber);
+    }
+
+    .benchmark-table tr.user-wait td {
+      font-style: italic;
+      color: var(--dim);
+    }
+
+    .benchmark-table tr.total-row td {
+      background: var(--card);
+      font-weight: 700;
+      color: var(--white);
+      border-top: 1px solid var(--border);
+    }
+
+    .benchmark-cost {
+      color: var(--green);
+    }
+
+    .benchmark-muted {
+      color: var(--muted);
+    }
+
+    .stat-pills {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .stat-pill-amber {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+    }
+
+    .stat-pill-teal {
+      background: rgba(13, 148, 136, 0.15);
+      color: var(--teal);
+    }
+
+    /* Confetti */
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
     /* Footer */
     .footer {
       text-align: center;
@@ -816,7 +1200,54 @@ Add due_date field to the Task model"
             <div class="skill-sublabel">Waiting...</div>
           </div>
         </div>
+
+        <!-- Clarification panel -->
+        <div class="clarification-panel" id="clarification-panel">
+          <div class="clarification-inner">
+            <div class="clarification-header">
+              <div class="clarification-title">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M9 1.5L1.5 16.5h15L9 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <path d="M9 7v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="9" cy="13" r="0.75" fill="currentColor"/>
+                </svg>
+                Agent needs clarification
+              </div>
+              <span class="clarification-counter" id="clarification-counter">0/0 answered</span>
+            </div>
+            <div class="clarification-subtext">
+              Answer all questions to continue. Max 3 questions · Use keyboard shortcuts a/b/c/d
+            </div>
+            <div id="questions-container"></div>
+            <div class="clarification-error" id="clarification-error"></div>
+            <button class="btn btn-amber clarification-submit" id="clarification-submit" disabled>
+              Continue → (0/0 answered)
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
+
+    <!-- Log panel -->
+    <div class="log-section" id="log-section">
+      <div class="log-header">
+        <span class="log-title">Live Output</span>
+        <div class="log-actions">
+          <button class="btn btn-outline btn-small" id="log-copy-btn" aria-label="Copy log">Copy</button>
+          <button class="btn btn-outline btn-small" id="log-clear-btn" aria-label="Clear log">Clear</button>
+        </div>
+      </div>
+      <div class="log-container" id="log-container"></div>
+    </div>
+
+    <!-- Benchmark table -->
+    <div class="benchmark-section" id="benchmark-section">
+      <div class="benchmark-header">
+        <span class="benchmark-title">Benchmark Summary</span>
+        <button class="btn btn-outline btn-small" id="benchmark-export-btn">Export JSON</button>
+      </div>
+      <table class="benchmark-table" id="benchmark-table"></table>
+      <div class="stat-pills" id="stat-pills"></div>
     </div>
 
   </main>
@@ -1416,7 +1847,10 @@ Add due_date field to the Task model"
       pauseTimer();
       setTaskStatus('AWAITING_CLARIFICATION');
       addLog('Agent needs clarification', 'warn');
-      // Phase 3 will implement the clarification panel
+      currentQuestions = event.questions || [];
+      selectedAnswers = {};
+      renderClarificationPanel(currentQuestions);
+      showClarificationPanel();
     }
 
     function onClarificationReceived(event) {
@@ -1452,10 +1886,7 @@ Add due_date field to the Task model"
 
       addLog(`PR opened: ${event.pr_url}`, 'success');
 
-      // Confetti (Phase 3 will implement)
-      if (typeof runConfetti === 'function') {
-        runConfetti();
-      }
+      runConfetti();
     }
 
     function onTaskFailed(event) {
@@ -1474,16 +1905,432 @@ Add due_date field to the Task model"
     }
 
     function onBenchmarkSummary(event) {
-      // Phase 3 will implement the benchmark table
       addLog(`Benchmark: ${event.total_elapsed_human || formatElapsed(event.total_elapsed_ms)} total, $${event.total_cost_usd?.toFixed(4) || '0.00'}`, 'info');
+      lastBenchmarkEvent = event;
+      renderBenchmarkTable(event);
     }
 
-    // ─── Log helper (Phase 3 will add full log panel) ─
+    // ─── Log Panel ─────────────────────────────────────
+    const logSection = document.getElementById('log-section');
+    const logContainer = document.getElementById('log-container');
+    const logCopyBtn = document.getElementById('log-copy-btn');
+    const logClearBtn = document.getElementById('log-clear-btn');
+    let logLineCount = 0;
+
     function addLog(message, level) {
+      // Show log section
+      logSection.style.display = 'block';
+
       const now = new Date();
       const ts = now.toTimeString().substring(0, 8);
-      const prefix = level.toUpperCase().padEnd(7);
-      console.log(`[${ts}] ${prefix} ${message}`);
+
+      const line = document.createElement('div');
+      line.className = 'log-line';
+
+      const tsSpan = document.createElement('span');
+      tsSpan.className = 'log-ts';
+      tsSpan.textContent = `[${ts}] `;
+
+      const msgSpan = document.createElement('span');
+      msgSpan.className = `log-level-${level}`;
+      msgSpan.textContent = `${level.toUpperCase().padEnd(7)}  ${message}`;
+
+      line.appendChild(tsSpan);
+      line.appendChild(msgSpan);
+
+      // Check auto-scroll before appending
+      const shouldScroll = logContainer.scrollTop >=
+        logContainer.scrollHeight - logContainer.clientHeight - 50;
+
+      logContainer.appendChild(line);
+      logLineCount++;
+
+      // Trim excess lines
+      while (logLineCount > CONFIG.MAX_LOG_LINES) {
+        logContainer.removeChild(logContainer.firstChild);
+        logLineCount--;
+      }
+
+      if (shouldScroll) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+    }
+
+    logCopyBtn.addEventListener('click', () => {
+      const text = logContainer.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        logCopyBtn.textContent = 'Copied!';
+        setTimeout(() => { logCopyBtn.textContent = 'Copy'; }, 2000);
+      });
+    });
+
+    logClearBtn.addEventListener('click', () => {
+      logContainer.innerHTML = '';
+      logLineCount = 0;
+    });
+
+    // ─── Clarification Panel ─────────────────────────
+    const clarificationPanel = document.getElementById('clarification-panel');
+    const questionsContainer = document.getElementById('questions-container');
+    const clarificationCounter = document.getElementById('clarification-counter');
+    const clarificationSubmit = document.getElementById('clarification-submit');
+    const clarificationError = document.getElementById('clarification-error');
+
+    let currentQuestions = [];
+    let selectedAnswers = {};
+    let clarificationVisible = false;
+
+    function showClarificationPanel() {
+      clarificationPanel.classList.add('open');
+      clarificationVisible = true;
+      clarificationPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function hideClarificationPanel() {
+      clarificationPanel.classList.remove('open');
+      clarificationVisible = false;
+    }
+
+    function renderClarificationPanel(questions) {
+      questionsContainer.innerHTML = '';
+      selectedAnswers = {};
+
+      questions.forEach((q, qi) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.dataset.questionIndex = qi;
+
+        const header = document.createElement('div');
+        header.className = 'question-header';
+        header.textContent = `Q${qi + 1} of ${questions.length}`;
+
+        const text = document.createElement('div');
+        text.className = 'question-text';
+        text.textContent = q.question;
+
+        card.appendChild(header);
+        card.appendChild(text);
+
+        const letters = ['a', 'b', 'c', 'd'];
+        q.options.forEach((opt, oi) => {
+          const row = document.createElement('div');
+          row.className = 'option-row';
+          row.dataset.questionId = q.id;
+          row.dataset.optionId = opt.id;
+          row.dataset.optionIndex = oi;
+          row.tabIndex = 0;
+          row.setAttribute('role', 'radio');
+          row.setAttribute('aria-checked', 'false');
+
+          row.innerHTML = `
+            <div class="option-radio"><div class="option-radio-dot"></div></div>
+            <div class="option-content">
+              <span class="option-letter">${letters[oi] || String.fromCharCode(97 + oi)})</span>
+              <span class="option-label">${escapeHtml(opt.label)}</span>
+            </div>
+          `;
+
+          row.addEventListener('click', () => selectOption(q.id, opt.id, qi));
+          row.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              selectOption(q.id, opt.id, qi);
+            }
+          });
+
+          card.appendChild(row);
+
+          // "Other" textarea
+          if (opt.id === 'other') {
+            const textarea = document.createElement('textarea');
+            textarea.className = 'other-textarea';
+            textarea.placeholder = 'Describe what you want...';
+            textarea.dataset.questionId = q.id;
+            card.appendChild(textarea);
+          }
+        });
+
+        questionsContainer.appendChild(card);
+      });
+
+      updateClarificationCounter();
+    }
+
+    function selectOption(questionId, optionId, questionIndex) {
+      selectedAnswers[questionId] = optionId;
+
+      // Update UI for this question
+      const allRows = questionsContainer.querySelectorAll(`.option-row[data-question-id="${questionId}"]`);
+      allRows.forEach(r => {
+        r.classList.toggle('selected', r.dataset.optionId === optionId);
+        r.setAttribute('aria-checked', r.dataset.optionId === optionId ? 'true' : 'false');
+      });
+
+      // Toggle "other" textarea
+      const otherTextarea = questionsContainer.querySelector(`textarea[data-question-id="${questionId}"]`);
+      if (otherTextarea) {
+        otherTextarea.classList.toggle('open', optionId === 'other');
+        if (optionId === 'other') {
+          setTimeout(() => otherTextarea.focus(), 300);
+        }
+      }
+
+      updateClarificationCounter();
+    }
+
+    function updateClarificationCounter() {
+      const total = currentQuestions.length;
+      const answered = Object.keys(selectedAnswers).length;
+      clarificationCounter.textContent = `${answered}/${total} answered`;
+      clarificationCounter.classList.toggle('all-answered', answered === total);
+      clarificationSubmit.disabled = answered < total;
+      clarificationSubmit.textContent = `Continue → (${answered}/${total} answered)`;
+    }
+
+    function getFirstUnansweredIndex() {
+      for (let i = 0; i < currentQuestions.length; i++) {
+        if (!selectedAnswers[currentQuestions[i].id]) return i;
+      }
+      return -1;
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (!clarificationVisible) return;
+
+      const letters = ['a', 'b', 'c', 'd'];
+      const letterIndex = letters.indexOf(e.key);
+
+      if (letterIndex !== -1) {
+        // Don't capture if typing in textarea
+        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+        const qIdx = getFirstUnansweredIndex();
+        if (qIdx === -1) return;
+
+        const q = currentQuestions[qIdx];
+        if (q.options[letterIndex]) {
+          selectOption(q.id, q.options[letterIndex].id, qIdx);
+        }
+      }
+
+      if (e.key === 'Enter' && !clarificationSubmit.disabled) {
+        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+        submitAnswers();
+      }
+    });
+
+    clarificationSubmit.addEventListener('click', submitAnswers);
+
+    async function submitAnswers() {
+      // Validate "other" textareas
+      for (const [qId, optId] of Object.entries(selectedAnswers)) {
+        if (optId === 'other') {
+          const textarea = questionsContainer.querySelector(`textarea[data-question-id="${qId}"]`);
+          if (textarea && textarea.value.trim().length < 5) {
+            clarificationError.textContent = 'Please provide at least 5 characters for custom answers.';
+            clarificationError.classList.add('visible');
+            textarea.focus();
+            return;
+          }
+        }
+      }
+
+      clarificationError.classList.remove('visible');
+      clarificationSubmit.disabled = true;
+      clarificationSubmit.innerHTML = '<span class="spinner"></span> Submitting...';
+
+      const answers = currentQuestions.map(q => {
+        const selectedOptId = selectedAnswers[q.id];
+        const selectedOpt = q.options.find(o => o.id === selectedOptId);
+        let answerValue = selectedOpt ? selectedOpt.value : null;
+
+        if (selectedOptId === 'other') {
+          const textarea = questionsContainer.querySelector(`textarea[data-question-id="${q.id}"]`);
+          answerValue = textarea ? textarea.value.trim() : '';
+        }
+
+        return {
+          question_id: q.id,
+          question: q.question,
+          selected_option_id: selectedOptId,
+          selected_option_label: selectedOpt ? selectedOpt.label : '',
+          answer: answerValue,
+        };
+      });
+
+      try {
+        const res = await fetch(`${CONFIG.API_URL}/api/tasks/${currentTaskId}/clarify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers }),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `HTTP ${res.status}`);
+        }
+
+        hideClarificationPanel();
+        addLog('Answers submitted — resuming pipeline...', 'success');
+
+      } catch (err) {
+        clarificationError.textContent = `Error: ${err.message}`;
+        clarificationError.classList.add('visible');
+        clarificationSubmit.disabled = false;
+        clarificationSubmit.textContent = `Continue → (${Object.keys(selectedAnswers).length}/${currentQuestions.length} answered)`;
+      }
+    }
+
+    // ─── Benchmark Table ─────────────────────────────
+    const benchmarkSection = document.getElementById('benchmark-section');
+    const benchmarkTable = document.getElementById('benchmark-table');
+    const benchmarkExportBtn = document.getElementById('benchmark-export-btn');
+    const statPills = document.getElementById('stat-pills');
+    let lastBenchmarkEvent = null;
+
+    function renderBenchmarkTable(event) {
+      benchmarkSection.style.display = 'block';
+
+      let html = `
+        <thead>
+          <tr>
+            <th>Skill</th>
+            <th>Time</th>
+            <th>LLM</th>
+            <th>Tokens</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+
+      event.skills.forEach(s => {
+        const retried = s.retry_count > 0 ? ' retried' : '';
+        const skillLabel = SKILL_LABELS[s.skill] || s.skill;
+        const time = s.elapsed_ms >= 1000 ? `${(s.elapsed_ms / 1000).toFixed(1)}s` : `${s.elapsed_ms}ms`;
+        const llmTime = s.llm_ms >= 1000 ? `${(s.llm_ms / 1000).toFixed(1)}s` : `${s.llm_ms}ms`;
+        const tokens = s.input_tokens || s.output_tokens
+          ? `${s.input_tokens}t in · ${s.output_tokens}t out`
+          : '--';
+        const cost = s.cost_usd > 0 ? `$${s.cost_usd.toFixed(4)}` : '--';
+
+        html += `
+          <tr class="${retried}">
+            <td>${escapeHtml(skillLabel)}</td>
+            <td>${time}</td>
+            <td class="benchmark-muted">${llmTime}</td>
+            <td class="benchmark-muted">${tokens}</td>
+            <td class="benchmark-cost">${cost}</td>
+          </tr>
+        `;
+      });
+
+      // User wait row (if clarification happened)
+      const clarifierSkill = event.skills.find(s => s.skill === 'clarifier');
+      if (clarifierSkill && clarifierSkill.elapsed_ms > clarifierSkill.llm_ms + 1000) {
+        const userWait = clarifierSkill.elapsed_ms - clarifierSkill.llm_ms - (clarifierSkill.non_llm_ms || 0);
+        if (userWait > 500) {
+          const waitTime = userWait >= 1000 ? `${(userWait / 1000).toFixed(1)}s` : `${userWait}ms`;
+          html += `
+            <tr class="user-wait">
+              <td>&nbsp;&nbsp;→ user response</td>
+              <td>${waitTime}</td>
+              <td>--</td>
+              <td>--</td>
+              <td>--</td>
+            </tr>
+          `;
+        }
+      }
+
+      // Total row
+      const totalTime = event.total_elapsed_human || formatElapsed(event.total_elapsed_ms);
+      const totalCost = event.total_cost_usd > 0 ? `$${event.total_cost_usd.toFixed(4)}` : '--';
+      const totalTokens = `${event.total_input_tokens}t in · ${event.total_output_tokens}t out`;
+
+      html += `
+          <tr class="total-row">
+            <td>Total</td>
+            <td>${totalTime}</td>
+            <td></td>
+            <td class="benchmark-muted">${totalTokens}</td>
+            <td class="benchmark-cost">${totalCost}</td>
+          </tr>
+        </tbody>
+      `;
+
+      benchmarkTable.innerHTML = html;
+
+      // Stat pills
+      const slowest = SKILL_LABELS[event.slowest_skill] || event.slowest_skill;
+      const cachedTokens = event.total_cached_tokens || 0;
+      const cachedSavings = (cachedTokens * 0.000003).toFixed(4);
+
+      statPills.innerHTML = `
+        <span class="stat-pill stat-pill-amber">Slowest: ${escapeHtml(slowest)}</span>
+        ${cachedTokens > 0 ? `<span class="stat-pill stat-pill-teal">Cached tokens: ${cachedTokens} saved ~$${cachedSavings}</span>` : ''}
+      `;
+    }
+
+    benchmarkExportBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`${CONFIG.API_URL}/api/tasks/${currentTaskId}/benchmark`);
+        const data = await res.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `benchmark-${currentTaskId}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch {
+        // Fallback: use stored event data
+        if (lastBenchmarkEvent) {
+          const blob = new Blob([JSON.stringify(lastBenchmarkEvent, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `benchmark-${currentTaskId}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }
+    });
+
+    // ─── Confetti ────────────────────────────────────
+    function runConfetti() {
+      const colors = [
+        '#7C3AED', '#0D9488', '#F59E0B',
+        '#10B981', '#F8FAFC', '#EF4444'
+      ];
+      const count = 60;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        const size = 4 + Math.random() * 6;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const duration = 1 + Math.random() * 1.5;
+        const delay = Math.random() * 0.5;
+        const isCircle = Math.random() > 0.5;
+
+        el.style.cssText = `
+          position: fixed;
+          top: -10px;
+          left: ${left}vw;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${color};
+          border-radius: ${isCircle ? '50%' : '2px'};
+          pointer-events: none;
+          z-index: 9999;
+          animation: confettiFall ${duration}s ease-in forwards;
+          animation-delay: ${delay}s;
+        `;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), (duration + delay) * 1000 + 100);
+      }
     }
 
     // ─── Wire up task submission to SSE ──────────────
@@ -1498,6 +2345,12 @@ Add due_date field to the Task model"
       setTaskStatus('PENDING');
       prButtonWrap.style.display = 'none';
       resetAllSkillCards();
+
+      // Reset log and benchmark
+      logContainer.innerHTML = '';
+      logLineCount = 0;
+      benchmarkSection.style.display = 'none';
+      hideClarificationPanel();
 
       sseManager = new SSEManager(taskId, handleEvent);
       sseManager.connect();
