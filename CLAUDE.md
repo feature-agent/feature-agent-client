@@ -80,11 +80,11 @@ Production" by Adnan Khan.
   PR: "feat: skill pipeline, SSE streaming,
        live timer, task status"
 
-### Phase 3 -- Clarification UI and log panel [ ]
+### Phase 3 -- Clarification UI and log panel [DONE]
   PR: "feat: clarification options UI,
        live log panel, benchmark table"
 
-### Phase 4 -- Demo app, GIF, README [ ]
+### Phase 4 -- Demo app, GIF, README [DONE]
   PR: "feat: GitHub Pages demo, animated GIF
        instructions, full README with
        architecture diagram"

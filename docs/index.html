@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Agent — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0A0E1A;
+      --card: #1E293B;
+      --border: #334155;
+      --purple: #7C3AED;
+      --teal: #0D9488;
+      --amber: #F59E0B;
+      --green: #10B981;
+      --red: #EF4444;
+      --white: #F8FAFC;
+      --muted: #94A3B8;
+      --dim: #475569;
+      --mono: Consolas, Monaco, 'Courier New', monospace;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--dim);
+    }
+
+    .status-dot.connected {
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    }
+
+    .status-text {
+      color: var(--muted);
+    }
+
+    .status-url {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 4px;
+      font-family: var(--mono);
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Card base */
+    .card {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    /* Task submission */
+    .task-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .task-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 2px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--muted);
+      color: var(--white);
+    }
+
+    .btn-teal {
+      background: var(--teal);
+      color: var(--white);
+    }
+
+    .btn-teal:hover {
+      background: #0f766e;
+    }
+
+    .btn-teal:disabled {
+      background: var(--dim);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .btn-dim {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--dim);
+    }
+
+    .btn-dim:hover {
+      color: var(--muted);
+      border-color: var(--muted);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Textarea */
+    .task-input {
+      width: 100%;
+      min-height: 100px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 12px;
+      resize: vertical;
+      transition: border-color 0.15s ease;
+    }
+
+    .task-input:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .task-input::placeholder {
+      color: var(--dim);
+    }
+
+    /* Text input */
+    .repo-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    .repo-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 10px 12px;
+      transition: border-color 0.15s ease;
+    }
+
+    .repo-input:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .repo-input::placeholder {
+      color: var(--dim);
+    }
+
+    .repo-example {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 4px;
+    }
+
+    /* Error message */
+    .field-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 4px;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    .submit-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 8px;
+      display: none;
+    }
+
+    .submit-error.visible {
+      display: block;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    .shake {
+      animation: shake 0.3s ease;
+    }
+
+    /* Buttons row */
+    .buttons-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    /* Recent tasks dropdown */
+    .recent-tasks-wrapper {
+      position: relative;
+    }
+
+    .recent-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      width: 360px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      z-index: 100;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      display: none;
+    }
+
+    .recent-dropdown.open {
+      display: block;
+    }
+
+    .recent-task-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .recent-task-row:hover {
+      background: var(--bg);
+    }
+
+    .recent-task-id {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .recent-task-summary {
+      font-size: 12px;
+      color: var(--white);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-task-time {
+      font-size: 11px;
+      color: var(--dim);
+      flex-shrink: 0;
+    }
+
+    .recent-task-pr {
+      font-size: 11px;
+      color: var(--teal);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .recent-task-pr:hover {
+      text-decoration: underline;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    .badge-gray {
+      background: rgba(71, 85, 105, 0.3);
+      color: var(--dim);
+    }
+
+    .badge-teal {
+      background: rgba(13, 148, 136, 0.2);
+      color: var(--teal);
+    }
+
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--amber);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+    }
+
+    .badge-red {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--red);
+    }
+
+    .recent-empty {
+      text-align: center;
+      color: var(--dim);
+      font-size: 12px;
+      padding: 16px;
+    }
+
+    /* Pipeline section */
+    .pipeline-section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .task-id-copy {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      position: relative;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .task-id-copy:hover {
+      background: var(--bg);
+    }
+
+    .copy-tooltip {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green);
+      color: var(--white);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .copy-tooltip.show {
+      opacity: 1;
+    }
+
+    .badge-pulsing {
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .elapsed-timer {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .pr-button {
+      display: none;
+      margin-left: 8px;
+    }
+
+    /* Skill pipeline grid */
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    /* Skill card states */
+    .skill-card.waiting {
+      border-color: var(--border);
+      background: var(--card);
+    }
+
+    .skill-card.running {
+      border-color: var(--teal);
+      border-width: 1.5px;
+      background: #0A1F1A;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+
+    .skill-card.done {
+      border-color: var(--green);
+      background: #0A1F12;
+    }
+
+    .skill-card.failed {
+      border-color: var(--red);
+      background: #1F0A0A;
+    }
+
+    .skill-card.retrying {
+      border-color: var(--amber);
+      border-width: 1.5px;
+      background: #1F1500;
+    }
+
+    /* Skill indicator */
+    .skill-indicator {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .indicator-waiting {
+      border: 1.5px solid var(--dim);
+    }
+
+    .indicator-running {
+      border: 2px solid transparent;
+      border-top-color: var(--teal);
+      animation: spin 1s linear infinite;
+    }
+
+    .indicator-done {
+      background: var(--green);
+    }
+
+    .indicator-failed {
+      background: var(--red);
+    }
+
+    .indicator-retrying {
+      border: 2px solid transparent;
+      border-top-color: var(--amber);
+      animation: spin 1s linear infinite;
+    }
+
+    .indicator-icon {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* Skill text */
+    .skill-label {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .skill-card.running .skill-label,
+    .skill-card.done .skill-label,
+    .skill-card.failed .skill-label,
+    .skill-card.retrying .skill-label {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .skill-sublabel {
+      font-size: 11px;
+      color: var(--dim);
+      min-height: 16px;
+      word-break: break-word;
+    }
+
+    .skill-card.running .skill-sublabel {
+      color: var(--teal);
+    }
+
+    .skill-card.done .skill-sublabel {
+      color: var(--green);
+    }
+
+    .skill-card.failed .skill-sublabel {
+      color: var(--red);
+    }
+
+    .skill-card.retrying .skill-sublabel {
+      color: var(--amber);
+    }
+
+    .skill-cost {
+      font-size: 10px;
+      color: var(--dim);
+    }
+
+    .retry-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--amber);
+      background: rgba(245, 158, 11, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Clarification panel */
+    .clarification-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin: 16px 0;
+    }
+
+    .clarification-panel.open {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .clarification-inner {
+      border: 1.5px solid var(--amber);
+      background: #1A1000;
+      border-radius: 12px;
+      padding: 20px;
+      animation: amberpulse 2s ease-in-out infinite;
+    }
+
+    @keyframes amberpulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.1); }
+    }
+
+    .clarification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .clarification-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--amber);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .clarification-counter {
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .clarification-counter.all-answered {
+      color: var(--green);
+    }
+
+    .clarification-subtext {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .question-card {
+      background: #0F1823;
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .question-header {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--dim);
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      color: var(--white);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .option-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 44px;
+      margin-bottom: 4px;
+    }
+
+    .option-row:hover {
+      background: var(--card);
+    }
+
+    .option-row:hover .option-label {
+      color: var(--white);
+    }
+
+    .option-row.selected {
+      background: #0D2B26;
+      border-left: 3px solid var(--teal);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .option-row.selected .option-label {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .option-radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--dim);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      transition: all 0.15s ease;
+    }
+
+    .option-row.selected .option-radio {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    .option-radio-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--white);
+      display: none;
+    }
+
+    .option-row.selected .option-radio-dot {
+      display: block;
+    }
+
+    .option-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .option-letter {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--teal);
+      margin-bottom: 2px;
+    }
+
+    .option-label {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .other-textarea {
+      width: 100%;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-size: 13px;
+      padding: 0;
+      margin-top: 0;
+      resize: none;
+    }
+
+    .other-textarea.open {
+      max-height: 100px;
+      min-height: 60px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .other-textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .other-textarea::placeholder {
+      color: var(--dim);
+    }
+
+    .clarification-submit {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-amber {
+      background: var(--amber);
+      color: #000;
+    }
+
+    .btn-amber:hover {
+      background: #d97706;
+    }
+
+    .btn-amber:disabled {
+      background: var(--dim);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .clarification-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 6px;
+      display: none;
+    }
+
+    .clarification-error.visible {
+      display: block;
+    }
+
+    /* Log panel */
+    .log-section {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .log-title {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .log-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .log-container {
+      background: #050A14;
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      height: 280px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .log-line {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .log-ts {
+      color: var(--dim);
+    }
+
+    .log-level-info { color: var(--muted); }
+    .log-level-warn { color: var(--amber); }
+    .log-level-error { color: var(--red); }
+    .log-level-success { color: var(--green); }
+
+    /* Benchmark table */
+    .benchmark-section {
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .benchmark-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .benchmark-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .benchmark-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .benchmark-table th {
+      background: var(--card);
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .benchmark-table td {
+      padding: 8px 12px;
+      color: var(--white);
+    }
+
+    .benchmark-table tr:nth-child(even) td {
+      background: #111827;
+    }
+
+    .benchmark-table tr:nth-child(odd) td {
+      background: var(--bg);
+    }
+
+    .benchmark-table tr.retried td {
+      border-left: 3px solid var(--amber);
+    }
+
+    .benchmark-table tr.user-wait td {
+      font-style: italic;
+      color: var(--dim);
+    }
+
+    .benchmark-table tr.total-row td {
+      background: var(--card);
+      font-weight: 700;
+      color: var(--white);
+      border-top: 1px solid var(--border);
+    }
+
+    .benchmark-cost {
+      color: var(--green);
+    }
+
+    .benchmark-muted {
+      color: var(--muted);
+    }
+
+    .stat-pills {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .stat-pill-amber {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+    }
+
+    .stat-pill-teal {
+      background: rgba(13, 148, 136, 0.15);
+      color: var(--teal);
+    }
+
+    /* Confetti */
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Demo banner */
+    .demo-banner {
+      background: #1A1000;
+      border-bottom: 1px solid var(--amber);
+      padding: 10px 24px;
+      text-align: center;
+      color: var(--amber);
+      font-size: 13px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px 24px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 0.5px solid var(--border);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main {
+        padding: 16px;
+      }
+
+      .header {
+        padding: 12px 16px;
+      }
+
+      .recent-dropdown {
+        width: 280px;
+      }
+
+      .buttons-row {
+        flex-wrap: wrap;
+      }
+
+      .skill-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .status-bar {
+        gap: 8px;
+      }
+
+      .elapsed-timer {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .task-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .recent-dropdown {
+        width: calc(100vw - 48px);
+        right: -12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Demo banner -->
+  <div class="demo-banner">
+    Demo Mode — watching a simulated agent run. No backend required.
+    Deploy feature-agent-core to use the real agent.
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-title">Feature Agent</div>
+      <div class="header-subtitle">Autonomous coding agent</div>
+    </div>
+    <div class="header-right">
+      <div class="status-indicator">
+        <div class="status-dot" id="status-dot"></div>
+        <span class="status-text" id="status-text">Disconnected</span>
+      </div>
+      <div class="status-url" id="status-url"></div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Task Submission Card -->
+    <div class="card">
+      <div class="task-card-header">
+        <div class="task-card-title">New Task</div>
+        <div class="recent-tasks-wrapper">
+          <button class="btn btn-outline btn-small" id="recent-btn" aria-label="Show recent tasks">
+            Recent Tasks
+          </button>
+          <div class="recent-dropdown" id="recent-dropdown" role="menu">
+          </div>
+        </div>
+      </div>
+
+      <textarea
+        class="task-input"
+        id="task-input"
+        placeholder="Paste a GitHub issue URL or describe the feature to implement...
+
+Examples:
+https://github.com/user/repo/issues/42
+Add pagination to the tasks endpoint
+Add due_date field to the Task model"
+        aria-label="Task description or GitHub issue URL"
+      ></textarea>
+      <div class="field-error" id="task-error">Please enter a task description or GitHub issue URL</div>
+
+      <label class="repo-label" for="repo-input">Target repository</label>
+      <input
+        class="repo-input"
+        id="repo-input"
+        type="text"
+        placeholder="owner/repository-name"
+        aria-label="Target repository"
+      >
+      <div class="repo-example">e.g. adnankhan/projectflow-api</div>
+      <div class="field-error" id="repo-error">Repository must be in owner/repo format</div>
+
+      <div class="buttons-row">
+        <button class="btn btn-teal" id="run-btn" disabled>
+          <span id="run-btn-text">Run Agent →</span>
+        </button>
+        <button class="btn btn-dim" id="clear-btn">Clear</button>
+      </div>
+      <div class="submit-error" id="submit-error"></div>
+    </div>
+
+    <!-- Pipeline Dashboard -->
+    <div class="pipeline-section" id="pipeline-section">
+      <div class="card">
+        <!-- Status bar -->
+        <div class="status-bar">
+          <span class="task-id-copy" id="task-id-display" role="button" tabindex="0" aria-label="Copy task ID">
+            <span class="copy-tooltip" id="copy-tooltip">Copied!</span>
+          </span>
+          <span class="badge badge-gray" id="task-status-badge">PENDING</span>
+          <span class="elapsed-timer" id="elapsed-timer"></span>
+          <div class="pr-button" id="pr-button-wrap">
+            <a class="btn btn-teal btn-small" id="pr-link" href="#" target="_blank" rel="noopener">View PR →</a>
+          </div>
+        </div>
+
+        <!-- Skill grid -->
+        <div class="skill-grid" id="skill-grid">
+          <div class="skill-card waiting" data-skill="issue_reader">
+            <div class="skill-indicator indicator-waiting"></div>
+            <div class="skill-label">Reading issue</div>
+            <div class="skill-sublabel">Waiting...</div>
+          </div>
+          <div class="skill-card waiting" data-skill="clarifier">
+            <div class="skill-indicator indicator-waiting"></div>
+            <div class="skill-label">Analyzing clarity</div>
+            <div class="skill-sublabel">Waiting...</div>
+          </div>
+          <div class="skill-card waiting" data-skill="codebase_explorer">
+            <div class="skill-indicator indicator-waiting"></div>
+            <div class="skill-label">Exploring codebase</div>
+            <div class="skill-sublabel">Waiting...</div>
+          </div>
+          <div class="skill-card waiting" data-skill="code_writer">
+            <div class="skill-indicator indicator-waiting"></div>
+            <div class="skill-label">Writing code</div>
+            <div class="skill-sublabel">Waiting...</div>
+          </div>
+          <div class="skill-card waiting" data-skill="test_writer">
+            <div class="skill-indicator indicator-waiting"></div>
+            <div class="skill-label">Writing tests</div>
+            <div class="skill-sublabel">Waiting...</div>
+          </div>
+          <div class="skill-card waiting" data-skill="test_runner">
+            <div class="skill-indicator indicator-waiting"></div>
+            <div class="skill-label">Running tests</div>
+            <div class="skill-sublabel">Waiting...</div>
+          </div>
+          <div class="skill-card waiting" data-skill="pr_creator">
+            <div class="skill-indicator indicator-waiting"></div>
+            <div class="skill-label">Creating PR</div>
+            <div class="skill-sublabel">Waiting...</div>
+          </div>
+        </div>
+
+        <!-- Clarification panel -->
+        <div class="clarification-panel" id="clarification-panel">
+          <div class="clarification-inner">
+            <div class="clarification-header">
+              <div class="clarification-title">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M9 1.5L1.5 16.5h15L9 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <path d="M9 7v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="9" cy="13" r="0.75" fill="currentColor"/>
+                </svg>
+                Agent needs clarification
+              </div>
+              <span class="clarification-counter" id="clarification-counter">0/0 answered</span>
+            </div>
+            <div class="clarification-subtext">
+              Answer all questions to continue. Max 3 questions · Use keyboard shortcuts a/b/c/d
+            </div>
+            <div id="questions-container"></div>
+            <div class="clarification-error" id="clarification-error"></div>
+            <button class="btn btn-amber clarification-submit" id="clarification-submit" disabled>
+              Continue → (0/0 answered)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log panel -->
+    <div class="log-section" id="log-section">
+      <div class="log-header">
+        <span class="log-title">Live Output</span>
+        <div class="log-actions">
+          <button class="btn btn-outline btn-small" id="log-copy-btn" aria-label="Copy log">Copy</button>
+          <button class="btn btn-outline btn-small" id="log-clear-btn" aria-label="Clear log">Clear</button>
+        </div>
+      </div>
+      <div class="log-container" id="log-container"></div>
+    </div>
+
+    <!-- Benchmark table -->
+    <div class="benchmark-section" id="benchmark-section">
+      <div class="benchmark-header">
+        <span class="benchmark-title">Benchmark Summary</span>
+        <button class="btn btn-outline btn-small" id="benchmark-export-btn">Export JSON</button>
+      </div>
+      <table class="benchmark-table" id="benchmark-table"></table>
+      <div class="stat-pills" id="stat-pills"></div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Feature Agent · Built with Claude API · Course by Adnan Khan
+  </footer>
+
+  <script src="mock-data.js"></script>
+  <script>
+    // ─── Configuration ───────────────────────────────
+    const CONFIG = {
+      API_URL: 'http://localhost:8000',
+      MAX_LOG_LINES: 500,
+      SSE_RECONNECT_MS: 3000,
+      PING_TIMEOUT_MS: 30000,
+      TIMER_UPDATE_MS: 100,
+    };
+
+    // ─── State ───────────────────────────────────────
+    let currentTaskId = null;
+    let sseManager = null;
+    let validationDebounceTimer = null;
+
+    // ─── DOM References ──────────────────────────────
+    const taskInput = document.getElementById('task-input');
+    const repoInput = document.getElementById('repo-input');
+    const runBtn = document.getElementById('run-btn');
+    const runBtnText = document.getElementById('run-btn-text');
+    const clearBtn = document.getElementById('clear-btn');
+    const taskError = document.getElementById('task-error');
+    const repoError = document.getElementById('repo-error');
+    const submitError = document.getElementById('submit-error');
+    const recentBtn = document.getElementById('recent-btn');
+    const recentDropdown = document.getElementById('recent-dropdown');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const statusUrl = document.getElementById('status-url');
+    const pipelineSection = document.getElementById('pipeline-section');
+
+    // ─── Init ────────────────────────────────────────
+    statusUrl.textContent = CONFIG.API_URL;
+
+    // ─── Validation ──────────────────────────────────
+    const REPO_PATTERN = /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/;
+
+    function validateInputs() {
+      const hasTask = taskInput.value.trim().length > 0;
+      const hasRepo = repoInput.value.trim().length > 0;
+      const validRepo = !hasRepo || REPO_PATTERN.test(repoInput.value.trim());
+      runBtn.disabled = !(hasTask && hasRepo && validRepo);
+    }
+
+    function debounceValidate() {
+      clearTimeout(validationDebounceTimer);
+      validationDebounceTimer = setTimeout(validateInputs, 300);
+    }
+
+    taskInput.addEventListener('input', debounceValidate);
+    repoInput.addEventListener('input', debounceValidate);
+
+    // ─── Clear ───────────────────────────────────────
+    clearBtn.addEventListener('click', () => {
+      taskInput.value = '';
+      repoInput.value = '';
+      taskError.classList.remove('visible');
+      repoError.classList.remove('visible');
+      submitError.classList.remove('visible');
+      validateInputs();
+      taskInput.focus();
+    });
+
+    // ─── Submit ──────────────────────────────────────
+    runBtn.addEventListener('click', () => {
+      submitTask();
+    });
+
+    async function submitTask() {
+      currentTaskId = 'demo1234';
+
+      // Store in recent tasks
+      storeRecentTask({
+        task_id: currentTaskId,
+        status: 'PENDING',
+        created_at: new Date().toISOString(),
+        pr_url: null,
+        task_summary: taskInput.value.trim().substring(0, 60),
+      });
+
+      // Update connection status
+      setConnectionStatus(true);
+
+      // Start SSE stream and show pipeline
+      startSSEStream(currentTaskId);
+      pipelineSection.scrollIntoView({ behavior: 'smooth' });
+
+      runBtn.disabled = true;
+      runBtnText.textContent = 'Running...';
+    }
+
+    // ─── Connection Status ───────────────────────────
+    function setConnectionStatus(connected) {
+      if (connected) {
+        statusDot.classList.add('connected');
+        statusText.textContent = 'Connected';
+      } else {
+        statusDot.classList.remove('connected');
+        statusText.textContent = 'Disconnected';
+      }
+    }
+
+    // ─── Recent Tasks (localStorage) ─────────────────
+    const STORAGE_KEY = 'fa_recent_tasks';
+
+    function getRecentTasks() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function storeRecentTask(task) {
+      const tasks = getRecentTasks();
+      // Remove duplicate
+      const filtered = tasks.filter(t => t.task_id !== task.task_id);
+      filtered.unshift(task);
+      // Keep max 5
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered.slice(0, 5)));
+    }
+
+    function timeAgo(dateStr) {
+      const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      if (seconds < 60) return `${seconds}s ago`;
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return `${days}d ago`;
+    }
+
+    function getStatusBadgeClass(status) {
+      switch (status) {
+        case 'PENDING': return 'badge-gray';
+        case 'RUNNING': return 'badge-teal';
+        case 'AWAITING_CLARIFICATION': return 'badge-amber';
+        case 'DONE': return 'badge-green';
+        case 'FAILED': return 'badge-red';
+        default: return 'badge-gray';
+      }
+    }
+
+    function renderRecentDropdown() {
+      const tasks = getRecentTasks();
+      if (tasks.length === 0) {
+        recentDropdown.innerHTML = '<div class="recent-empty">No recent tasks</div>';
+        return;
+      }
+
+      recentDropdown.innerHTML = tasks.map(t => `
+        <div class="recent-task-row" role="menuitem" data-task-id="${t.task_id}">
+          <span class="recent-task-id">${t.task_id.substring(0, 8)}</span>
+          <span class="badge ${getStatusBadgeClass(t.status)}">${t.status}</span>
+          <span class="recent-task-summary">${escapeHtml(t.task_summary || '')}</span>
+          <span class="recent-task-time">${timeAgo(t.created_at)}</span>
+          ${t.pr_url ? `<a class="recent-task-pr" href="${escapeHtml(t.pr_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">PR →</a>` : ''}
+        </div>
+      `).join('');
+
+      // Add click handlers
+      recentDropdown.querySelectorAll('.recent-task-row').forEach(row => {
+        row.addEventListener('click', () => {
+          const taskId = row.dataset.taskId;
+          currentTaskId = taskId;
+          startSSEStream(taskId);
+          pipelineSection.scrollIntoView({ behavior: 'smooth' });
+          closeRecentDropdown();
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ─── Recent Dropdown Toggle ──────────────────────
+    recentBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = recentDropdown.classList.contains('open');
+      if (isOpen) {
+        closeRecentDropdown();
+      } else {
+        renderRecentDropdown();
+        recentDropdown.classList.add('open');
+      }
+    });
+
+    function closeRecentDropdown() {
+      recentDropdown.classList.remove('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!recentDropdown.contains(e.target) && e.target !== recentBtn) {
+        closeRecentDropdown();
+      }
+    });
+
+    // ─── Keyboard: Escape to close dropdown ──────────
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeRecentDropdown();
+      }
+    });
+
+    // ─── Pipeline DOM References ─────────────────────
+    const taskIdDisplay = document.getElementById('task-id-display');
+    const copyTooltip = document.getElementById('copy-tooltip');
+    const taskStatusBadge = document.getElementById('task-status-badge');
+    const elapsedTimer = document.getElementById('elapsed-timer');
+    const prButtonWrap = document.getElementById('pr-button-wrap');
+    const prLink = document.getElementById('pr-link');
+    const skillGrid = document.getElementById('skill-grid');
+
+    // ─── Skill name to display label map ─────────────
+    const SKILL_LABELS = {
+      issue_reader: 'Reading issue',
+      clarifier: 'Analyzing clarity',
+      codebase_explorer: 'Exploring codebase',
+      code_writer: 'Writing code',
+      test_writer: 'Writing tests',
+      test_runner: 'Running tests',
+      pr_creator: 'Creating PR',
+    };
+
+    // ─── Copy task ID ────────────────────────────────
+    taskIdDisplay.addEventListener('click', () => {
+      if (currentTaskId) {
+        navigator.clipboard.writeText(currentTaskId).then(() => {
+          copyTooltip.classList.add('show');
+          setTimeout(() => copyTooltip.classList.remove('show'), 1500);
+        });
+      }
+    });
+
+    taskIdDisplay.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        taskIdDisplay.click();
+      }
+    });
+
+    // ─── Timer ───────────────────────────────────────
+    let timerStart = null;
+    let timerPaused = 0;
+    let timerPauseStart = null;
+    let timerInterval = null;
+    let timerRafId = null;
+
+    function startTimer() {
+      timerStart = performance.now();
+      timerPaused = 0;
+      timerPauseStart = null;
+      updateTimerDisplay();
+    }
+
+    function pauseTimer() {
+      if (timerStart && !timerPauseStart) {
+        timerPauseStart = performance.now();
+        if (timerRafId) {
+          cancelAnimationFrame(timerRafId);
+          timerRafId = null;
+        }
+      }
+    }
+
+    function resumeTimer() {
+      if (timerPauseStart) {
+        timerPaused += performance.now() - timerPauseStart;
+        timerPauseStart = null;
+        updateTimerDisplay();
+      }
+    }
+
+    function stopTimer() {
+      if (timerRafId) {
+        cancelAnimationFrame(timerRafId);
+        timerRafId = null;
+      }
+    }
+
+    function getElapsedMs() {
+      if (!timerStart) return 0;
+      const now = timerPauseStart || performance.now();
+      return now - timerStart - timerPaused;
+    }
+
+    function formatElapsed(ms) {
+      if (ms < 60000) {
+        return `${(ms / 1000).toFixed(1)}s`;
+      }
+      const minutes = Math.floor(ms / 60000);
+      const seconds = ((ms % 60000) / 1000).toFixed(1);
+      return `${minutes}m ${seconds}s`;
+    }
+
+    function updateTimerDisplay() {
+      elapsedTimer.textContent = formatElapsed(getElapsedMs());
+      timerRafId = requestAnimationFrame(updateTimerDisplay);
+    }
+
+    // ─── Skill Card Helpers ──────────────────────────
+    function getSkillCard(skillName) {
+      return skillGrid.querySelector(`[data-skill="${skillName}"]`);
+    }
+
+    function setSkillState(skillName, state, opts = {}) {
+      const card = getSkillCard(skillName);
+      if (!card) return;
+
+      // Reset classes
+      card.className = `skill-card ${state}`;
+
+      const indicator = card.querySelector('.skill-indicator');
+      const label = card.querySelector('.skill-label');
+      const sublabel = card.querySelector('.skill-sublabel');
+
+      // Reset indicator
+      indicator.className = `skill-indicator indicator-${state}`;
+      indicator.innerHTML = '';
+
+      switch (state) {
+        case 'waiting':
+          sublabel.textContent = 'Waiting...';
+          break;
+
+        case 'running':
+          sublabel.textContent = opts.message || 'Processing...';
+          break;
+
+        case 'done':
+          indicator.innerHTML = `<svg class="indicator-icon" viewBox="0 0 10 10" fill="none">
+            <path d="M2 5.5L4 7.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>`;
+          if (opts.elapsed_ms !== undefined) {
+            sublabel.textContent = `${opts.elapsed_ms}ms`;
+          }
+          // Show cost info
+          let costEl = card.querySelector('.skill-cost');
+          if (!costEl) {
+            costEl = document.createElement('div');
+            costEl.className = 'skill-cost';
+            card.appendChild(costEl);
+          }
+          if (opts.cost_usd !== undefined && opts.cost_usd > 0) {
+            const tokens = (opts.input_tokens || 0) + (opts.output_tokens || 0);
+            costEl.textContent = `$${opts.cost_usd.toFixed(4)} · ${tokens}t`;
+          } else {
+            costEl.textContent = '';
+          }
+          break;
+
+        case 'failed':
+          indicator.innerHTML = `<svg class="indicator-icon" viewBox="0 0 10 10" fill="none">
+            <path d="M2.5 2.5L7.5 7.5M7.5 2.5L2.5 7.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>`;
+          sublabel.textContent = opts.message || 'Failed';
+          if (opts.retry_count > 0) {
+            let retryEl = card.querySelector('.retry-badge');
+            if (!retryEl) {
+              retryEl = document.createElement('span');
+              retryEl.className = 'retry-badge';
+              card.appendChild(retryEl);
+            }
+            retryEl.textContent = `Retry ${opts.retry_count}/2`;
+          }
+          break;
+
+        case 'retrying':
+          sublabel.textContent = opts.message || `Retrying (${opts.retry_count || 1}/2)...`;
+          break;
+      }
+    }
+
+    function resetAllSkillCards() {
+      Object.keys(SKILL_LABELS).forEach(skill => {
+        setSkillState(skill, 'waiting');
+        // Remove any leftover cost/retry elements
+        const card = getSkillCard(skill);
+        if (card) {
+          const costEl = card.querySelector('.skill-cost');
+          if (costEl) costEl.remove();
+          const retryEl = card.querySelector('.retry-badge');
+          if (retryEl) retryEl.remove();
+        }
+      });
+    }
+
+    // ─── Task Status Badge ───────────────────────────
+    function setTaskStatus(status) {
+      const badgeClasses = {
+        PENDING: 'badge badge-gray',
+        RUNNING: 'badge badge-teal badge-pulsing',
+        AWAITING_CLARIFICATION: 'badge badge-amber badge-pulsing',
+        DONE: 'badge badge-green',
+        FAILED: 'badge badge-red',
+      };
+      taskStatusBadge.className = badgeClasses[status] || 'badge badge-gray';
+      taskStatusBadge.textContent = status;
+    }
+
+    // ─── Mock SSE Manager (Demo Mode) ─────────────────
+    class SSEManager {
+      constructor(taskId, onEvent) {
+        this.onEvent = onEvent;
+        this.timers = [];
+      }
+
+      connect() {
+        let cumulative = 0;
+        MOCK_EVENTS.forEach(({ delay_ms, event }) => {
+          cumulative += delay_ms;
+          const t = setTimeout(() => {
+            event.timestamp = new Date().toISOString();
+            this.onEvent(event);
+          }, cumulative);
+          this.timers.push(t);
+        });
+      }
+
+      disconnect() {
+        this.timers.forEach(clearTimeout);
+        this.timers = [];
+      }
+    }
+
+    // ─── Event Dispatcher ────────────────────────────
+    function handleEvent(event) {
+      switch (event.type) {
+        case 'task_start':             onTaskStart(event); break;
+        case 'clarification_needed':   onClarificationNeeded(event); break;
+        case 'clarification_received': onClarificationReceived(event); break;
+        case 'skill_start':            onSkillStart(event); break;
+        case 'skill_progress':         onSkillProgress(event); break;
+        case 'skill_done':             onSkillDone(event); break;
+        case 'skill_error':            onSkillError(event); break;
+        case 'log':                    onLog(event); break;
+        case 'task_done':              onTaskDone(event); break;
+        case 'benchmark_summary':      onBenchmarkSummary(event); break;
+        case 'task_failed':            onTaskFailed(event); break;
+      }
+    }
+
+    // ─── Event Handlers ──────────────────────────────
+    function onTaskStart(event) {
+      pipelineSection.style.display = 'block';
+      taskIdDisplay.childNodes[0].textContent = event.task_id || currentTaskId;
+      setTaskStatus('RUNNING');
+      startTimer();
+      resetAllSkillCards();
+      setConnectionStatus(true);
+    }
+
+    function onSkillStart(event) {
+      setSkillState(event.skill, 'running', { message: event.message });
+      addLog(`[${SKILL_LABELS[event.skill] || event.skill}] started`, 'info');
+    }
+
+    function onSkillProgress(event) {
+      setSkillState(event.skill, 'running', { message: event.message });
+    }
+
+    function onSkillDone(event) {
+      setSkillState(event.skill, 'done', {
+        elapsed_ms: event.elapsed_ms,
+        cost_usd: event.cost_usd,
+        input_tokens: event.input_tokens,
+        output_tokens: event.output_tokens,
+      });
+      addLog(`[${SKILL_LABELS[event.skill] || event.skill}] done (${event.elapsed_ms}ms)`, 'success');
+    }
+
+    function onSkillError(event) {
+      if (event.retry_count && event.retry_count > 0) {
+        setSkillState(event.skill, 'retrying', {
+          message: event.message,
+          retry_count: event.retry_count,
+        });
+        addLog(`[${SKILL_LABELS[event.skill] || event.skill}] retrying (${event.retry_count}/2)`, 'warn');
+      } else {
+        setSkillState(event.skill, 'failed', {
+          message: event.message,
+          retry_count: event.retry_count,
+        });
+        addLog(`[${SKILL_LABELS[event.skill] || event.skill}] failed: ${event.message}`, 'error');
+      }
+    }
+
+    function onClarificationNeeded(event) {
+      pauseTimer();
+      setTaskStatus('AWAITING_CLARIFICATION');
+      addLog('Agent needs clarification', 'warn');
+      currentQuestions = event.questions || [];
+      selectedAnswers = {};
+      renderClarificationPanel(currentQuestions);
+      showClarificationPanel();
+    }
+
+    function onClarificationReceived(event) {
+      resumeTimer();
+      setTaskStatus('RUNNING');
+      addLog('Answers received — continuing', 'info');
+    }
+
+    function onLog(event) {
+      addLog(event.message, event.level || 'info');
+    }
+
+    function onTaskDone(event) {
+      stopTimer();
+      elapsedTimer.textContent = formatElapsed(event.elapsed_ms || getElapsedMs());
+      setTaskStatus('DONE');
+      setConnectionStatus(false);
+
+      // Show PR button
+      if (event.pr_url) {
+        prLink.href = event.pr_url;
+        prButtonWrap.style.display = 'block';
+      }
+
+      // Update localStorage
+      const tasks = getRecentTasks();
+      const idx = tasks.findIndex(t => t.task_id === currentTaskId);
+      if (idx !== -1) {
+        tasks[idx].status = 'DONE';
+        tasks[idx].pr_url = event.pr_url;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      }
+
+      addLog(`PR opened: ${event.pr_url}`, 'success');
+
+      runConfetti();
+    }
+
+    function onTaskFailed(event) {
+      stopTimer();
+      setTaskStatus('FAILED');
+      setConnectionStatus(false);
+      addLog(event.reason || 'Task failed', 'error');
+
+      // Update localStorage
+      const tasks = getRecentTasks();
+      const idx = tasks.findIndex(t => t.task_id === currentTaskId);
+      if (idx !== -1) {
+        tasks[idx].status = 'FAILED';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      }
+    }
+
+    function onBenchmarkSummary(event) {
+      addLog(`Benchmark: ${event.total_elapsed_human || formatElapsed(event.total_elapsed_ms)} total, $${event.total_cost_usd?.toFixed(4) || '0.00'}`, 'info');
+      lastBenchmarkEvent = event;
+      renderBenchmarkTable(event);
+    }
+
+    // ─── Log Panel ─────────────────────────────────────
+    const logSection = document.getElementById('log-section');
+    const logContainer = document.getElementById('log-container');
+    const logCopyBtn = document.getElementById('log-copy-btn');
+    const logClearBtn = document.getElementById('log-clear-btn');
+    let logLineCount = 0;
+
+    function addLog(message, level) {
+      // Show log section
+      logSection.style.display = 'block';
+
+      const now = new Date();
+      const ts = now.toTimeString().substring(0, 8);
+
+      const line = document.createElement('div');
+      line.className = 'log-line';
+
+      const tsSpan = document.createElement('span');
+      tsSpan.className = 'log-ts';
+      tsSpan.textContent = `[${ts}] `;
+
+      const msgSpan = document.createElement('span');
+      msgSpan.className = `log-level-${level}`;
+      msgSpan.textContent = `${level.toUpperCase().padEnd(7)}  ${message}`;
+
+      line.appendChild(tsSpan);
+      line.appendChild(msgSpan);
+
+      // Check auto-scroll before appending
+      const shouldScroll = logContainer.scrollTop >=
+        logContainer.scrollHeight - logContainer.clientHeight - 50;
+
+      logContainer.appendChild(line);
+      logLineCount++;
+
+      // Trim excess lines
+      while (logLineCount > CONFIG.MAX_LOG_LINES) {
+        logContainer.removeChild(logContainer.firstChild);
+        logLineCount--;
+      }
+
+      if (shouldScroll) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+    }
+
+    logCopyBtn.addEventListener('click', () => {
+      const text = logContainer.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        logCopyBtn.textContent = 'Copied!';
+        setTimeout(() => { logCopyBtn.textContent = 'Copy'; }, 2000);
+      });
+    });
+
+    logClearBtn.addEventListener('click', () => {
+      logContainer.innerHTML = '';
+      logLineCount = 0;
+    });
+
+    // ─── Clarification Panel ─────────────────────────
+    const clarificationPanel = document.getElementById('clarification-panel');
+    const questionsContainer = document.getElementById('questions-container');
+    const clarificationCounter = document.getElementById('clarification-counter');
+    const clarificationSubmit = document.getElementById('clarification-submit');
+    const clarificationError = document.getElementById('clarification-error');
+
+    let currentQuestions = [];
+    let selectedAnswers = {};
+    let clarificationVisible = false;
+
+    function showClarificationPanel() {
+      clarificationPanel.classList.add('open');
+      clarificationVisible = true;
+      clarificationPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function hideClarificationPanel() {
+      clarificationPanel.classList.remove('open');
+      clarificationVisible = false;
+    }
+
+    function renderClarificationPanel(questions) {
+      questionsContainer.innerHTML = '';
+      selectedAnswers = {};
+
+      questions.forEach((q, qi) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.dataset.questionIndex = qi;
+
+        const header = document.createElement('div');
+        header.className = 'question-header';
+        header.textContent = `Q${qi + 1} of ${questions.length}`;
+
+        const text = document.createElement('div');
+        text.className = 'question-text';
+        text.textContent = q.question;
+
+        card.appendChild(header);
+        card.appendChild(text);
+
+        const letters = ['a', 'b', 'c', 'd'];
+        q.options.forEach((opt, oi) => {
+          const row = document.createElement('div');
+          row.className = 'option-row';
+          row.dataset.questionId = q.id;
+          row.dataset.optionId = opt.id;
+          row.dataset.optionIndex = oi;
+          row.tabIndex = 0;
+          row.setAttribute('role', 'radio');
+          row.setAttribute('aria-checked', 'false');
+
+          row.innerHTML = `
+            <div class="option-radio"><div class="option-radio-dot"></div></div>
+            <div class="option-content">
+              <span class="option-letter">${letters[oi] || String.fromCharCode(97 + oi)})</span>
+              <span class="option-label">${escapeHtml(opt.label)}</span>
+            </div>
+          `;
+
+          row.addEventListener('click', () => selectOption(q.id, opt.id, qi));
+          row.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              selectOption(q.id, opt.id, qi);
+            }
+          });
+
+          card.appendChild(row);
+
+          // "Other" textarea
+          if (opt.id === 'other') {
+            const textarea = document.createElement('textarea');
+            textarea.className = 'other-textarea';
+            textarea.placeholder = 'Describe what you want...';
+            textarea.dataset.questionId = q.id;
+            card.appendChild(textarea);
+          }
+        });
+
+        questionsContainer.appendChild(card);
+      });
+
+      updateClarificationCounter();
+    }
+
+    function selectOption(questionId, optionId, questionIndex) {
+      selectedAnswers[questionId] = optionId;
+
+      // Update UI for this question
+      const allRows = questionsContainer.querySelectorAll(`.option-row[data-question-id="${questionId}"]`);
+      allRows.forEach(r => {
+        r.classList.toggle('selected', r.dataset.optionId === optionId);
+        r.setAttribute('aria-checked', r.dataset.optionId === optionId ? 'true' : 'false');
+      });
+
+      // Toggle "other" textarea
+      const otherTextarea = questionsContainer.querySelector(`textarea[data-question-id="${questionId}"]`);
+      if (otherTextarea) {
+        otherTextarea.classList.toggle('open', optionId === 'other');
+        if (optionId === 'other') {
+          setTimeout(() => otherTextarea.focus(), 300);
+        }
+      }
+
+      updateClarificationCounter();
+    }
+
+    function updateClarificationCounter() {
+      const total = currentQuestions.length;
+      const answered = Object.keys(selectedAnswers).length;
+      clarificationCounter.textContent = `${answered}/${total} answered`;
+      clarificationCounter.classList.toggle('all-answered', answered === total);
+      clarificationSubmit.disabled = answered < total;
+      clarificationSubmit.textContent = `Continue → (${answered}/${total} answered)`;
+    }
+
+    function getFirstUnansweredIndex() {
+      for (let i = 0; i < currentQuestions.length; i++) {
+        if (!selectedAnswers[currentQuestions[i].id]) return i;
+      }
+      return -1;
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (!clarificationVisible) return;
+
+      const letters = ['a', 'b', 'c', 'd'];
+      const letterIndex = letters.indexOf(e.key);
+
+      if (letterIndex !== -1) {
+        // Don't capture if typing in textarea
+        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+        const qIdx = getFirstUnansweredIndex();
+        if (qIdx === -1) return;
+
+        const q = currentQuestions[qIdx];
+        if (q.options[letterIndex]) {
+          selectOption(q.id, q.options[letterIndex].id, qIdx);
+        }
+      }
+
+      if (e.key === 'Enter' && !clarificationSubmit.disabled) {
+        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+        submitAnswers();
+      }
+    });
+
+    clarificationSubmit.addEventListener('click', submitAnswers);
+
+    async function submitAnswers() {
+      hideClarificationPanel();
+      addLog('Answers submitted — resuming pipeline...', 'success');
+      handleEvent({
+        type: 'clarification_received',
+        task_id: currentTaskId,
+        answer_count: currentQuestions.length,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // ─── Benchmark Table ─────────────────────────────
+    const benchmarkSection = document.getElementById('benchmark-section');
+    const benchmarkTable = document.getElementById('benchmark-table');
+    const benchmarkExportBtn = document.getElementById('benchmark-export-btn');
+    const statPills = document.getElementById('stat-pills');
+    let lastBenchmarkEvent = null;
+
+    function renderBenchmarkTable(event) {
+      benchmarkSection.style.display = 'block';
+
+      let html = `
+        <thead>
+          <tr>
+            <th>Skill</th>
+            <th>Time</th>
+            <th>LLM</th>
+            <th>Tokens</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+
+      event.skills.forEach(s => {
+        const retried = s.retry_count > 0 ? ' retried' : '';
+        const skillLabel = SKILL_LABELS[s.skill] || s.skill;
+        const time = s.elapsed_ms >= 1000 ? `${(s.elapsed_ms / 1000).toFixed(1)}s` : `${s.elapsed_ms}ms`;
+        const llmTime = s.llm_ms >= 1000 ? `${(s.llm_ms / 1000).toFixed(1)}s` : `${s.llm_ms}ms`;
+        const tokens = s.input_tokens || s.output_tokens
+          ? `${s.input_tokens}t in · ${s.output_tokens}t out`
+          : '--';
+        const cost = s.cost_usd > 0 ? `$${s.cost_usd.toFixed(4)}` : '--';
+
+        html += `
+          <tr class="${retried}">
+            <td>${escapeHtml(skillLabel)}</td>
+            <td>${time}</td>
+            <td class="benchmark-muted">${llmTime}</td>
+            <td class="benchmark-muted">${tokens}</td>
+            <td class="benchmark-cost">${cost}</td>
+          </tr>
+        `;
+      });
+
+      // User wait row (if clarification happened)
+      const clarifierSkill = event.skills.find(s => s.skill === 'clarifier');
+      if (clarifierSkill && clarifierSkill.elapsed_ms > clarifierSkill.llm_ms + 1000) {
+        const userWait = clarifierSkill.elapsed_ms - clarifierSkill.llm_ms - (clarifierSkill.non_llm_ms || 0);
+        if (userWait > 500) {
+          const waitTime = userWait >= 1000 ? `${(userWait / 1000).toFixed(1)}s` : `${userWait}ms`;
+          html += `
+            <tr class="user-wait">
+              <td>&nbsp;&nbsp;→ user response</td>
+              <td>${waitTime}</td>
+              <td>--</td>
+              <td>--</td>
+              <td>--</td>
+            </tr>
+          `;
+        }
+      }
+
+      // Total row
+      const totalTime = event.total_elapsed_human || formatElapsed(event.total_elapsed_ms);
+      const totalCost = event.total_cost_usd > 0 ? `$${event.total_cost_usd.toFixed(4)}` : '--';
+      const totalTokens = `${event.total_input_tokens}t in · ${event.total_output_tokens}t out`;
+
+      html += `
+          <tr class="total-row">
+            <td>Total</td>
+            <td>${totalTime}</td>
+            <td></td>
+            <td class="benchmark-muted">${totalTokens}</td>
+            <td class="benchmark-cost">${totalCost}</td>
+          </tr>
+        </tbody>
+      `;
+
+      benchmarkTable.innerHTML = html;
+
+      // Stat pills
+      const slowest = SKILL_LABELS[event.slowest_skill] || event.slowest_skill;
+      const cachedTokens = event.total_cached_tokens || 0;
+      const cachedSavings = (cachedTokens * 0.000003).toFixed(4);
+
+      statPills.innerHTML = `
+        <span class="stat-pill stat-pill-amber">Slowest: ${escapeHtml(slowest)}</span>
+        ${cachedTokens > 0 ? `<span class="stat-pill stat-pill-teal">Cached tokens: ${cachedTokens} saved ~$${cachedSavings}</span>` : ''}
+      `;
+    }
+
+    benchmarkExportBtn.addEventListener('click', () => {
+      if (lastBenchmarkEvent) {
+        const blob = new Blob([JSON.stringify(lastBenchmarkEvent, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `benchmark-${currentTaskId}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    });
+
+    // ─── Confetti ────────────────────────────────────
+    function runConfetti() {
+      const colors = [
+        '#7C3AED', '#0D9488', '#F59E0B',
+        '#10B981', '#F8FAFC', '#EF4444'
+      ];
+      const count = 60;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        const size = 4 + Math.random() * 6;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const duration = 1 + Math.random() * 1.5;
+        const delay = Math.random() * 0.5;
+        const isCircle = Math.random() > 0.5;
+
+        el.style.cssText = `
+          position: fixed;
+          top: -10px;
+          left: ${left}vw;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${color};
+          border-radius: ${isCircle ? '50%' : '2px'};
+          pointer-events: none;
+          z-index: 9999;
+          animation: confettiFall ${duration}s ease-in forwards;
+          animation-delay: ${delay}s;
+        `;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), (duration + delay) * 1000 + 100);
+      }
+    }
+
+    // ─── Wire up task submission to SSE ──────────────
+    function startSSEStream(taskId) {
+      if (sseManager) {
+        sseManager.disconnect();
+      }
+
+      // Show pipeline
+      pipelineSection.style.display = 'block';
+      taskIdDisplay.childNodes[0].textContent = taskId;
+      setTaskStatus('PENDING');
+      prButtonWrap.style.display = 'none';
+      resetAllSkillCards();
+
+      // Reset log and benchmark
+      logContainer.innerHTML = '';
+      logLineCount = 0;
+      benchmarkSection.style.display = 'none';
+      hideClarificationPanel();
+
+      sseManager = new SSEManager(taskId, handleEvent);
+      sseManager.connect();
+    }
+    // ─── Demo: Pre-fill and auto-start ────────────────
+    taskInput.value = 'Add due_date field to tasks';
+    repoInput.value = 'adnankhan/projectflow-api';
+    validateInputs();
+
+    setTimeout(() => {
+      submitTask();
+    }, 2000);
+  </script>
+</body>
+</html>
