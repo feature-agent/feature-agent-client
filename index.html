@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0A0E1A;
+      --card: #1E293B;
+      --border: #334155;
+      --purple: #7C3AED;
+      --teal: #0D9488;
+      --amber: #F59E0B;
+      --green: #10B981;
+      --red: #EF4444;
+      --white: #F8FAFC;
+      --muted: #94A3B8;
+      --dim: #475569;
+      --mono: Consolas, Monaco, 'Courier New', monospace;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--dim);
+    }
+
+    .status-dot.connected {
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    }
+
+    .status-text {
+      color: var(--muted);
+    }
+
+    .status-url {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 4px;
+      font-family: var(--mono);
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Card base */
+    .card {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    /* Task submission */
+    .task-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .task-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 2px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--muted);
+      color: var(--white);
+    }
+
+    .btn-teal {
+      background: var(--teal);
+      color: var(--white);
+    }
+
+    .btn-teal:hover {
+      background: #0f766e;
+    }
+
+    .btn-teal:disabled {
+      background: var(--dim);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .btn-dim {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--dim);
+    }
+
+    .btn-dim:hover {
+      color: var(--muted);
+      border-color: var(--muted);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Textarea */
+    .task-input {
+      width: 100%;
+      min-height: 100px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 12px;
+      resize: vertical;
+      transition: border-color 0.15s ease;
+    }
+
+    .task-input:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .task-input::placeholder {
+      color: var(--dim);
+    }
+
+    /* Text input */
+    .repo-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    .repo-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 10px 12px;
+      transition: border-color 0.15s ease;
+    }
+
+    .repo-input:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .repo-input::placeholder {
+      color: var(--dim);
+    }
+
+    .repo-example {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 4px;
+    }
+
+    /* Error message */
+    .field-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 4px;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    .submit-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 8px;
+      display: none;
+    }
+
+    .submit-error.visible {
+      display: block;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    .shake {
+      animation: shake 0.3s ease;
+    }
+
+    /* Buttons row */
+    .buttons-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    /* Recent tasks dropdown */
+    .recent-tasks-wrapper {
+      position: relative;
+    }
+
+    .recent-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      width: 360px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      z-index: 100;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      display: none;
+    }
+
+    .recent-dropdown.open {
+      display: block;
+    }
+
+    .recent-task-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .recent-task-row:hover {
+      background: var(--bg);
+    }
+
+    .recent-task-id {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .recent-task-summary {
+      font-size: 12px;
+      color: var(--white);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-task-time {
+      font-size: 11px;
+      color: var(--dim);
+      flex-shrink: 0;
+    }
+
+    .recent-task-pr {
+      font-size: 11px;
+      color: var(--teal);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .recent-task-pr:hover {
+      text-decoration: underline;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    .badge-gray {
+      background: rgba(71, 85, 105, 0.3);
+      color: var(--dim);
+    }
+
+    .badge-teal {
+      background: rgba(13, 148, 136, 0.2);
+      color: var(--teal);
+    }
+
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--amber);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+    }
+
+    .badge-red {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--red);
+    }
+
+    .recent-empty {
+      text-align: center;
+      color: var(--dim);
+      font-size: 12px;
+      padding: 16px;
+    }
+
+    /* Pipeline section placeholder (Phase 2) */
+    .pipeline-section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px 24px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 0.5px solid var(--border);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main {
+        padding: 16px;
+      }
+
+      .header {
+        padding: 12px 16px;
+      }
+
+      .recent-dropdown {
+        width: 280px;
+      }
+
+      .buttons-row {
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .task-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .recent-dropdown {
+        width: calc(100vw - 48px);
+        right: -12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-title">Feature Agent</div>
+      <div class="header-subtitle">Autonomous coding agent</div>
+    </div>
+    <div class="header-right">
+      <div class="status-indicator">
+        <div class="status-dot" id="status-dot"></div>
+        <span class="status-text" id="status-text">Disconnected</span>
+      </div>
+      <div class="status-url" id="status-url"></div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Task Submission Card -->
+    <div class="card">
+      <div class="task-card-header">
+        <div class="task-card-title">New Task</div>
+        <div class="recent-tasks-wrapper">
+          <button class="btn btn-outline btn-small" id="recent-btn" aria-label="Show recent tasks">
+            Recent Tasks
+          </button>
+          <div class="recent-dropdown" id="recent-dropdown" role="menu">
+          </div>
+        </div>
+      </div>
+
+      <textarea
+        class="task-input"
+        id="task-input"
+        placeholder="Paste a GitHub issue URL or describe the feature to implement...
+
+Examples:
+https://github.com/user/repo/issues/42
+Add pagination to the tasks endpoint
+Add due_date field to the Task model"
+        aria-label="Task description or GitHub issue URL"
+      ></textarea>
+      <div class="field-error" id="task-error">Please enter a task description or GitHub issue URL</div>
+
+      <label class="repo-label" for="repo-input">Target repository</label>
+      <input
+        class="repo-input"
+        id="repo-input"
+        type="text"
+        placeholder="owner/repository-name"
+        aria-label="Target repository"
+      >
+      <div class="repo-example">e.g. adnankhan/projectflow-api</div>
+      <div class="field-error" id="repo-error">Repository must be in owner/repo format</div>
+
+      <div class="buttons-row">
+        <button class="btn btn-teal" id="run-btn" disabled>
+          <span id="run-btn-text">Run Agent →</span>
+        </button>
+        <button class="btn btn-dim" id="clear-btn">Clear</button>
+      </div>
+      <div class="submit-error" id="submit-error"></div>
+    </div>
+
+    <!-- Pipeline section (Phase 2) -->
+    <div class="pipeline-section" id="pipeline-section">
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Feature Agent · Built with Claude API · Course by Adnan Khan
+  </footer>
+
+  <script>
+    // ─── Configuration ───────────────────────────────
+    const CONFIG = {
+      API_URL: 'http://localhost:8000',
+      MAX_LOG_LINES: 500,
+      SSE_RECONNECT_MS: 3000,
+      PING_TIMEOUT_MS: 30000,
+      TIMER_UPDATE_MS: 100,
+    };
+
+    // ─── State ───────────────────────────────────────
+    let currentTaskId = null;
+    let sseManager = null;
+    let validationDebounceTimer = null;
+
+    // ─── DOM References ──────────────────────────────
+    const taskInput = document.getElementById('task-input');
+    const repoInput = document.getElementById('repo-input');
+    const runBtn = document.getElementById('run-btn');
+    const runBtnText = document.getElementById('run-btn-text');
+    const clearBtn = document.getElementById('clear-btn');
+    const taskError = document.getElementById('task-error');
+    const repoError = document.getElementById('repo-error');
+    const submitError = document.getElementById('submit-error');
+    const recentBtn = document.getElementById('recent-btn');
+    const recentDropdown = document.getElementById('recent-dropdown');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const statusUrl = document.getElementById('status-url');
+    const pipelineSection = document.getElementById('pipeline-section');
+
+    // ─── Init ────────────────────────────────────────
+    statusUrl.textContent = CONFIG.API_URL;
+
+    // ─── Validation ──────────────────────────────────
+    const REPO_PATTERN = /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/;
+
+    function validateInputs() {
+      const hasTask = taskInput.value.trim().length > 0;
+      const hasRepo = repoInput.value.trim().length > 0;
+      const validRepo = !hasRepo || REPO_PATTERN.test(repoInput.value.trim());
+      runBtn.disabled = !(hasTask && hasRepo && validRepo);
+    }
+
+    function debounceValidate() {
+      clearTimeout(validationDebounceTimer);
+      validationDebounceTimer = setTimeout(validateInputs, 300);
+    }
+
+    taskInput.addEventListener('input', debounceValidate);
+    repoInput.addEventListener('input', debounceValidate);
+
+    // ─── Clear ───────────────────────────────────────
+    clearBtn.addEventListener('click', () => {
+      taskInput.value = '';
+      repoInput.value = '';
+      taskError.classList.remove('visible');
+      repoError.classList.remove('visible');
+      submitError.classList.remove('visible');
+      validateInputs();
+      taskInput.focus();
+    });
+
+    // ─── Submit ──────────────────────────────────────
+    runBtn.addEventListener('click', () => {
+      submitTask();
+    });
+
+    async function submitTask() {
+      // Clear previous errors
+      taskError.classList.remove('visible');
+      repoError.classList.remove('visible');
+      submitError.classList.remove('visible');
+
+      const taskValue = taskInput.value.trim();
+      const repoValue = repoInput.value.trim();
+      let hasError = false;
+
+      if (!taskValue) {
+        taskError.classList.add('visible');
+        taskInput.classList.add('shake');
+        setTimeout(() => taskInput.classList.remove('shake'), 300);
+        hasError = true;
+      }
+
+      if (!repoValue) {
+        repoError.textContent = 'Please enter a target repository';
+        repoError.classList.add('visible');
+        repoInput.classList.add('shake');
+        setTimeout(() => repoInput.classList.remove('shake'), 300);
+        hasError = true;
+      } else if (!REPO_PATTERN.test(repoValue)) {
+        repoError.textContent = 'Repository must be in owner/repo format';
+        repoError.classList.add('visible');
+        repoInput.classList.add('shake');
+        setTimeout(() => repoInput.classList.remove('shake'), 300);
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      // Show spinner
+      runBtn.disabled = true;
+      runBtnText.innerHTML = '<span class="spinner"></span> Submitting...';
+
+      // Build request body
+      const body = { target_repo: repoValue };
+      if (taskValue.startsWith('https://github.com/')) {
+        body.github_issue_url = taskValue;
+      } else {
+        body.task_description = taskValue;
+      }
+
+      try {
+        const res = await fetch(`${CONFIG.API_URL}/api/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        currentTaskId = data.task_id;
+
+        // Store in recent tasks
+        storeRecentTask({
+          task_id: currentTaskId,
+          status: 'PENDING',
+          created_at: new Date().toISOString(),
+          pr_url: null,
+          task_summary: taskValue.substring(0, 60),
+        });
+
+        // Update connection status
+        setConnectionStatus(true);
+
+        // Show pipeline section and scroll to it
+        pipelineSection.style.display = 'block';
+        pipelineSection.scrollIntoView({ behavior: 'smooth' });
+
+        // Start SSE (Phase 2 will implement SSEManager)
+        // For now, just log
+        console.log('Task created:', currentTaskId);
+
+      } catch (err) {
+        submitError.textContent = `Error: ${err.message}`;
+        submitError.classList.add('visible');
+      } finally {
+        runBtn.disabled = false;
+        runBtnText.textContent = 'Run Agent →';
+        validateInputs();
+      }
+    }
+
+    // ─── Connection Status ───────────────────────────
+    function setConnectionStatus(connected) {
+      if (connected) {
+        statusDot.classList.add('connected');
+        statusText.textContent = 'Connected';
+      } else {
+        statusDot.classList.remove('connected');
+        statusText.textContent = 'Disconnected';
+      }
+    }
+
+    // ─── Recent Tasks (localStorage) ─────────────────
+    const STORAGE_KEY = 'fa_recent_tasks';
+
+    function getRecentTasks() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function storeRecentTask(task) {
+      const tasks = getRecentTasks();
+      // Remove duplicate
+      const filtered = tasks.filter(t => t.task_id !== task.task_id);
+      filtered.unshift(task);
+      // Keep max 5
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered.slice(0, 5)));
+    }
+
+    function timeAgo(dateStr) {
+      const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      if (seconds < 60) return `${seconds}s ago`;
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return `${days}d ago`;
+    }
+
+    function getStatusBadgeClass(status) {
+      switch (status) {
+        case 'PENDING': return 'badge-gray';
+        case 'RUNNING': return 'badge-teal';
+        case 'AWAITING_CLARIFICATION': return 'badge-amber';
+        case 'DONE': return 'badge-green';
+        case 'FAILED': return 'badge-red';
+        default: return 'badge-gray';
+      }
+    }
+
+    function renderRecentDropdown() {
+      const tasks = getRecentTasks();
+      if (tasks.length === 0) {
+        recentDropdown.innerHTML = '<div class="recent-empty">No recent tasks</div>';
+        return;
+      }
+
+      recentDropdown.innerHTML = tasks.map(t => `
+        <div class="recent-task-row" role="menuitem" data-task-id="${t.task_id}">
+          <span class="recent-task-id">${t.task_id.substring(0, 8)}</span>
+          <span class="badge ${getStatusBadgeClass(t.status)}">${t.status}</span>
+          <span class="recent-task-summary">${escapeHtml(t.task_summary || '')}</span>
+          <span class="recent-task-time">${timeAgo(t.created_at)}</span>
+          ${t.pr_url ? `<a class="recent-task-pr" href="${escapeHtml(t.pr_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">PR →</a>` : ''}
+        </div>
+      `).join('');
+
+      // Add click handlers
+      recentDropdown.querySelectorAll('.recent-task-row').forEach(row => {
+        row.addEventListener('click', () => {
+          const taskId = row.dataset.taskId;
+          currentTaskId = taskId;
+          setConnectionStatus(true);
+          pipelineSection.style.display = 'block';
+          pipelineSection.scrollIntoView({ behavior: 'smooth' });
+          closeRecentDropdown();
+          console.log('Loading task:', taskId);
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ─── Recent Dropdown Toggle ──────────────────────
+    recentBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = recentDropdown.classList.contains('open');
+      if (isOpen) {
+        closeRecentDropdown();
+      } else {
+        renderRecentDropdown();
+        recentDropdown.classList.add('open');
+      }
+    });
+
+    function closeRecentDropdown() {
+      recentDropdown.classList.remove('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!recentDropdown.contains(e.target) && e.target !== recentBtn) {
+        closeRecentDropdown();
+      }
+    });
+
+    // ─── Keyboard: Escape to close dropdown ──────────
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeRecentDropdown();
+      }
+    });
+  </script>
+</body>
+</html>
