@@ -2,7 +2,7 @@
 
 ## What to capture
 A 50-55 second recording of the demo app running at:
-https://adnankhan.github.io/feature-agent-client/
+https://feature-agent.github.io/feature-agent-client/
 
 ## Recommended tools (Mac)
 - Kap (free): getkap.co -- records GIF directly

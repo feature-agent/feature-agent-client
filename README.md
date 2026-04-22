@@ -9,7 +9,7 @@
 ## What is this?
 
 Feature Agent Client is the browser interface for
-[Feature Agent Core](https://github.com/adnankhan/feature-agent-core).
+[Feature Agent Core](https://github.com/feature-agent/feature-agent-core).
 It lets you:
 
 - Submit a GitHub issue URL or plain text feature request to the AI agent
@@ -27,7 +27,7 @@ It lets you:
 
 Try it without any backend:
 
-**[Launch Demo](https://adnankhan.github.io/feature-agent-client/)**
+**[Launch Demo](https://feature-agent.github.io/feature-agent-client/)**
 
 The demo runs a complete simulated agent session
 in your browser using mock data. No API key needed.
@@ -171,13 +171,13 @@ Agent Worker
 ## Setup
 
 ### Prerequisites
-- [Feature Agent Core](https://github.com/adnankhan/feature-agent-core) running locally on port 8000
+- [Feature Agent Core](https://github.com/feature-agent/feature-agent-core) running locally on port 8000
 - A modern browser (Chrome, Firefox, Safari, Edge)
 
 ### Run locally
 
 ```bash
-git clone https://github.com/adnankhan/feature-agent-client
+git clone https://github.com/feature-agent/feature-agent-client
 cd feature-agent-client
 
 # Option 1: open directly (may have CORS limits)
@@ -208,9 +208,9 @@ To run all three repos together:
 ### 1. Clone everything
 
 ```bash
-git clone https://github.com/adnankhan/projectflow-api
-git clone https://github.com/adnankhan/feature-agent-core
-git clone https://github.com/adnankhan/feature-agent-client
+git clone https://github.com/feature-agent/projectflow-api
+git clone https://github.com/feature-agent/feature-agent-core
+git clone https://github.com/feature-agent/feature-agent-client
 ```
 
 ### 2. Set up projectflow-api
@@ -307,9 +307,9 @@ feature-agent-client/
 
 | Repo | Purpose |
 |------|---------|
-| [feature-agent-core](https://github.com/adnankhan/feature-agent-core) | AI agent backend |
-| [feature-agent-client](https://github.com/adnankhan/feature-agent-client) | This repo -- web UI |
-| [projectflow-api](https://github.com/adnankhan/projectflow-api) | Sample target codebase |
+| [feature-agent-core](https://github.com/feature-agent/feature-agent-core) | AI agent backend |
+| [feature-agent-client](https://github.com/feature-agent/feature-agent-client) | This repo -- web UI |
+| [projectflow-api](https://github.com/feature-agent/projectflow-api) | Sample target codebase |
 
 ---
 

@@ -145,7 +145,7 @@ const MOCK_EVENTS = [
       type: "log",
       task_id: "demo1234",
       level: "info",
-      message: "Cloned adnankhan/projectflow-api",
+      message: "Cloned feature-agent/projectflow-api",
       timestamp: new Date().toISOString()
     }
   },
@@ -433,7 +433,7 @@ const MOCK_EVENTS = [
       type: "log",
       task_id: "demo1234",
       level: "success",
-      message: "PR opened: github.com/adnankhan/projectflow-api/pull/4",
+      message: "PR opened: github.com/feature-agent/projectflow-api/pull/4",
       timestamp: new Date().toISOString()
     }
   },
@@ -457,7 +457,7 @@ const MOCK_EVENTS = [
     event: {
       type: "task_done",
       task_id: "demo1234",
-      pr_url: "https://github.com/adnankhan/projectflow-api/pull/4",
+      pr_url: "https://github.com/feature-agent/projectflow-api/pull/4",
       pr_number: 4,
       elapsed_ms: 47240,
       timestamp: new Date().toISOString()
