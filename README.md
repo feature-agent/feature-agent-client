@@ -2,8 +2,6 @@
 
 > Real-time web dashboard for the Feature Agent autonomous coding system
 
-![Feature Agent Demo](docs/demo.gif)
-
 ---
 
 ## What is this?
@@ -32,12 +30,6 @@ Try it without any backend:
 The demo runs a complete simulated agent session
 in your browser using mock data. No API key needed.
 Auto-starts 2 seconds after page load.
-
----
-
-## Screenshot
-
-![Dashboard Screenshot](docs/screenshot.png)
 
 ---
 
@@ -174,85 +166,62 @@ Agent Worker
 - [Feature Agent Core](https://github.com/feature-agent/feature-agent-core) running locally on port 8000
 - A modern browser (Chrome, Firefox, Safari, Edge)
 
-### Run locally
-
-```bash
-git clone https://github.com/feature-agent/feature-agent-client
-cd feature-agent-client
-
-# Option 1: open directly (may have CORS limits)
-open index.html
-
-# Option 2: serve with Python (recommended)
-python3 -m http.server 3000
-# Open http://localhost:3000
-```
-
 ### Connect to your backend
 
-Edit `index.html` at the top of the `<script>` tag:
+Copy the config template:
+
+```bash
+cp config.example.js config.local.js
+```
+
+Edit `config.local.js`:
 
 ```javascript
-const CONFIG = {
-  API_URL: 'http://localhost:8000', // change this
-  ...
-}
+window.LOCAL_CONFIG = {
+  API_URL: 'http://localhost:8000',
+  ANTHROPIC_API_KEY: 'sk-ant-...',
+  GITHUB_TOKEN: 'ghp_...',
+};
 ```
+
+`config.local.js` is gitignored so your keys never get committed.
+`config.example.js` is the safe template that ships in the repo.
+
+### Run locally
+
+The client is a single HTML file served by nginx in Docker.
+One command starts it:
+
+```bash
+cp config.example.js config.local.js
+# Edit config.local.js with your real Claude + GitHub keys
+
+docker compose up -d
+
+# Open http://localhost:8080
+```
+
+The client expects feature-agent-core to be running on
+`http://localhost:8000`. See the core repo to start the agent
+backend first.
 
 ---
 
 ## Complete System Setup
 
-To run all three repos together:
+This client only handles the UI. To run the full agent system,
+start three things in this order:
 
-### 1. Clone everything
+1. **feature-agent-core** (the agent backend) — Docker on port 8000
+2. **feature-agent-client** (this repo) — Docker on port 8080
+3. **projectflow-api** — only needed at agent runtime; the agent
+   clones it on demand. You don't run it manually.
 
-```bash
-git clone https://github.com/feature-agent/projectflow-api
-git clone https://github.com/feature-agent/feature-agent-core
-git clone https://github.com/feature-agent/feature-agent-client
-```
+See [feature-agent-core](https://github.com/feature-agent/feature-agent-core)
+README for backend setup. Then come back here to start the client.
 
-### 2. Set up projectflow-api
-
-```bash
-cd projectflow-api
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt -r requirements-dev.txt
-cp .env.example .env
-alembic upgrade head
-uvicorn app.main:app --reload --port 8001
-# Running at http://localhost:8001
-```
-
-### 3. Set up feature-agent-core
-
-```bash
-cd ../feature-agent-core
-cp .env.example .env
-# Edit .env:
-#   ANTHROPIC_API_KEY=your_key_here
-#   GITHUB_TOKEN=your_github_pat_here
-#   GITHUB_REPO=yourusername/projectflow-api
-docker compose up
-# Running at http://localhost:8000
-```
-
-### 4. Open the client
-
-```bash
-cd ../feature-agent-client
-python3 -m http.server 3000
-# Open http://localhost:3000
-```
-
-### 5. Run your first task
-
-In the client:
-- Task: paste a GitHub issue URL from projectflow-api
-  or type: `Add due_date field to tasks`
-- Repo: `yourusername/projectflow-api`
-- Click "Run Agent ->"
+For a step-by-step walkthrough across all three repos, see
+[SETUP.md](SETUP.md).
 
 ---
 
@@ -289,9 +258,11 @@ feature-agent-client/
   docs/
     index.html        Demo app (GitHub Pages)
     mock-data.js      Simulated SSE event sequence
-    demo.gif          Animated demo (record this)
-    screenshot.png    Static screenshot
     RECORD_GIF.md     Step-by-step GIF instructions
+
+  config.example.js   Safe config template (committed)
+  config.local.js     Your real keys (gitignored)
+  docker-compose.yml  nginx container on port 8080
 
   .github/
     workflows/
